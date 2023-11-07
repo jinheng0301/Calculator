@@ -3,9 +3,13 @@ import 'package:calculator/mode_exchange/components/button.dart';
 import 'package:calculator/mode_exchange/theme/theme_provider.dart';
 import 'package:calculator/models/button_list.dart';
 import 'package:flutter/material.dart';
+import 'package:math_expressions/math_expressions.dart';
 import 'package:provider/provider.dart';
 import 'package:calculator/mode_exchange/theme/light_theme.dart';
 import 'package:calculator/mode_exchange/theme/dark_theme.dart';
+
+String userInput = '';
+String result = '0';
 
 class Calculator extends StatefulWidget {
   @override
@@ -13,95 +17,91 @@ class Calculator extends StatefulWidget {
 }
 
 class _CalculatorState extends State<Calculator> {
-  String userInput = '';
-  String result = '0';
-
   @override
   Widget build(BuildContext context) {
-    ThemeData theme = Theme.of(context); // Get the current theme
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.background,
-      // appBar: AppBar(
-      //   title: Center(
-      //     child: Text(
-      //       'Calculator',
-      //     ),
-      //   ),
-      // ),
-      body: SafeArea(
-        child: Column(
-          children: [
-            SizedBox(
-              height: MediaQuery.of(context).size.height / 3,
+      body: Consumer<ThemeProvider>(
+        builder: (context, themeProvider, child) {
+          ThemeData theme = Theme.of(context); // Get the current theme
+          return Scaffold(
+            backgroundColor: theme.colorScheme.background,
+            body: SafeArea(
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   SizedBox(
-                    height: 10,
-                  ),
-                  Container(
-                    margin: EdgeInsets.only(right: 15),
-                    child: MyButton(
-                      onTap: () {
-                        print('light mode');
-                        Provider.of<ThemeProvider>(context, listen: false)
-                            .toggleTheme();
-                      },
-                      color: theme.colorScheme.background,
+                    height: MediaQuery.of(context).size.height / 3,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        SizedBox(
+                          height: 10,
+                        ),
+                        Container(
+                          margin: EdgeInsets.only(right: 15),
+                          child: MyButton(
+                            onTap: () {
+                              print('light mode');
+                              Provider.of<ThemeProvider>(context, listen: false)
+                                  .toggleTheme();
+                            },
+                            color: theme.colorScheme.background,
+                          ),
+                        ),
+                        // do the light and dark conversion
+                        Container(
+                          margin: EdgeInsets.only(right: 10),
+                          padding: EdgeInsets.all(20),
+                          alignment: Alignment.centerRight,
+                          child: Text(
+                            userInput,
+                            style: TextStyle(
+                              fontSize: 32,
+                              color: theme.textTheme.bodyLarge
+                                  ?.color, // Use theme's text color
+                            ),
+                          ),
+                        ),
+                        Container(
+                          margin: EdgeInsets.only(right: 10),
+                          padding: EdgeInsets.all(10),
+                          alignment: Alignment.centerRight,
+                          child: Text(
+                            result,
+                            style: TextStyle(
+                              fontSize: 50,
+                              color: theme.textTheme.headlineSmall?.color,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                  // do the light and dark conversion
-                  Container(
-                    margin: EdgeInsets.only(right: 10),
-                    padding: EdgeInsets.all(20),
-                    alignment: Alignment.centerRight,
-                    child: Text(
-                      userInput,
-                      style: TextStyle(
-                        fontSize: 32,
-                        color: theme.textTheme.bodyLarge
-                            ?.color, // Use theme's text color
-                      ),
-                    ),
+                  Divider(
+                    color: theme.primaryColor,
+                    thickness: 5,
                   ),
-                  Container(
-                    margin: EdgeInsets.only(right: 10),
-                    padding: EdgeInsets.all(10),
-                    alignment: Alignment.centerRight,
-                    child: Text(
-                      result,
-                      style: TextStyle(
-                        fontSize: 50,
-                        color: theme.textTheme.headlineSmall?.color,
-                        fontWeight: FontWeight.bold,
+                  Expanded(
+                    child: Container(
+                      padding: EdgeInsets.all(10),
+                      child: GridView.builder(
+                        itemCount: buttonList.length,
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 4,
+                          crossAxisSpacing: 12,
+                          mainAxisSpacing: 12,
+                        ),
+                        itemBuilder: (BuildContext context, int index) {
+                          return CustomButton(buttonList[index]);
+                        },
                       ),
                     ),
                   ),
                 ],
               ),
             ),
-            Divider(
-              color: theme.primaryColor,
-              thickness: 5,
-            ),
-            Expanded(
-              child: Container(
-                padding: EdgeInsets.all(10),
-                child: GridView.builder(
-                  itemCount: buttonList.length,
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 4,
-                    crossAxisSpacing: 12,
-                    mainAxisSpacing: 12,
-                  ),
-                  itemBuilder: (BuildContext context, int index) {
-                    return CustomButton(buttonList[index]);
-                  },
-                ),
-              ),
-            ),
-          ],
-        ),
+          );
+        },
       ),
     );
   }
@@ -136,7 +136,8 @@ class _CalculatorState extends State<Calculator> {
       onTap: () {
         setState(
           () {
-            handleButtons(text);
+            result = handleButtons(text, userInput);
+            userInput = result;
           },
         );
       },
