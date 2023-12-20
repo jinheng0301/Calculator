@@ -1,5 +1,5 @@
-import 'package:calculator/mode_exchange/components/box.dart';
-import 'package:calculator/mode_exchange/components/button.dart';
+import 'package:calculator/widgets/box.dart';
+import 'package:calculator/widgets/button.dart';
 import 'package:calculator/mode_exchange/theme/theme_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';

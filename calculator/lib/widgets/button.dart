@@ -3,7 +3,11 @@ import 'package:flutter/material.dart';
 class MyButton extends StatelessWidget {
   late final Color color;
   late void Function() onTap;
-  MyButton({required this.color, required this.onTap});
+
+  MyButton({
+    required this.color,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
